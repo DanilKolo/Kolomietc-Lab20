@@ -1,0 +1,68 @@
+const display = document.getElementById('display');
+const buttons = document.getElementById('buttons');
+
+// Змінні для обробки введення користувача
+let currentInput = '0'; // Поточний введений рядок
+let operator = null; // Поточний оператор (додавання, віднімання і т.д.)
+let waitingForSecondOperand = false; // Чи очікуємо другого операнда
+
+// Функція для додавання символу до відображення
+function appendToDisplay(value) {
+    if (currentInput === '0' || waitingForSecondOperand) {
+        currentInput = value;
+        waitingForSecondOperand = false;
+    } else {
+        currentInput += value;
+    }
+    display.textContent = currentInput;
+}
+
+// Функція для очищення відображення
+function clearDisplay() {
+    currentInput = '0';
+    operator = null;
+    waitingForSecondOperand = false;
+    display.textContent = currentInput;
+}
+
+// Функція для обчислення виразу
+function calculate() {
+    if (waitingForSecondOperand) {
+        return;
+    }
+    const inputValue = parseFloat(currentInput);
+    if (operator === '+') {
+        currentInput = (parseFloat(currentInput) + parseFloat(inputValue)).toString();
+    } else if (operator === '-') {
+        currentInput = (parseFloat(currentInput) - parseFloat(inputValue)).toString();
+    } else if (operator === '*') {
+        currentInput = (parseFloat(currentInput) * parseFloat(inputValue)).toString();
+    } else if (operator === '/') {
+        if (inputValue === 0) {
+            currentInput = 'Error';
+        } else {
+            currentInput = (parseFloat(currentInput) / parseFloat(inputValue)).toString();
+        }
+    }
+    operator = null;
+    waitingForSecondOperand = true;
+    display.textContent = currentInput;
+}
+
+// Додаємо обробники подій для кнопок
+buttons.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!target.matches('button')) {
+        return;
+    }
+    if (target.classList.contains('operator')) {
+        if (target.textContent === '=') {
+            calculate();
+        } else {
+            operator = target.textContent;
+            waitingForSecondOperand = false;
+        }
+    } else {
+        appendToDisplay(target.textContent);
+    }
+});
